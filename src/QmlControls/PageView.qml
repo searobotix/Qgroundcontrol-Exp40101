@@ -14,7 +14,7 @@ Rectangle {
 
     property real   maxHeight       ///< Maximum height that should be taken, smaller than this is ok
 
-    property real   _margins:           ScreenTools.defaultFontPixelWidth / 2
+    property real   _margins:           0//ScreenTools.defaultFontPixelWidth / 2
     property real   _pageWidth:         _root.width
     property var    _instrumentPages:   QGroundControl.corePlugin.instrumentPages
 

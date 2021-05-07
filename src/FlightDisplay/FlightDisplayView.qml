@@ -49,6 +49,16 @@ Item {
     property var    _rallyPointController:          _planController.rallyPointController
     property bool   _isPipVisible:                  QGroundControl.videoManager.hasVideo ? QGroundControl.loadBoolGlobalSetting(_PIPVisibleKey, true) : false
     property bool   _isPipVisible2:                 QGroundControl.videoManager.hasVideo2 ? QGroundControl.loadBoolGlobalSetting(_PIPVisibleKey2, true) : false
+    property bool   _isPipVisible3:                 QGroundControl.videoManager.hasVideo3 ? QGroundControl.loadBoolGlobalSetting(_PIPVisibleKey3, true) : false
+    property bool   _isPipVisible4:                 QGroundControl.videoManager.hasVideo4 ? QGroundControl.loadBoolGlobalSetting(_PIPVisibleKey4, true) : false
+
+    property real _mainisv: 1
+    property real _p2v: 2
+    property real _p3v: 3
+    property real _p4v: 4
+    property real _p5v: 5
+    property real _ptemp: 0
+
     property bool   _useChecklist:                  QGroundControl.settingsManager.appSettings.useChecklist.rawValue && QGroundControl.corePlugin.options.preFlightChecklistUrl.toString().length
     property bool   _enforceChecklist:              _useChecklist && QGroundControl.settingsManager.appSettings.enforceChecklist.rawValue
     property bool   _checklistComplete:             activeVehicle && (activeVehicle.checkListState === Vehicle.CheckListPassed)
@@ -71,6 +81,9 @@ Item {
     readonly property string    _mainIsMapKey:          "MainFlyWindowIsMap"
     readonly property string    _PIPVisibleKey:         "IsPIPVisible"
     readonly property string    _PIPVisibleKey2:         "IsPIPVisible2"
+    readonly property string    _PIPVisibleKey3:         "IsPIPVisible3"
+    readonly property string    _PIPVisibleKey4:         "IsPIPVisible4"
+
 
     Timer {
         id:             checklistPopupTimer
@@ -108,6 +121,16 @@ Item {
     function setPipVisibility2(state) {
         _isPipVisible2 = state;
         QGroundControl.saveBoolGlobalSetting(_PIPVisibleKey2, state)
+    }
+    //3
+    function setPipVisibility3(state) {
+        _isPipVisible3 = state;
+        QGroundControl.saveBoolGlobalSetting(_PIPVisibleKey3, state)
+    }
+    //4
+    function setPipVisibility4(state) {
+        _isPipVisible4 = state;
+        QGroundControl.saveBoolGlobalSetting(_PIPVisibleKey4, state)
     }
     //控件位置
     function isInstrumentRight() {
@@ -307,7 +330,7 @@ Item {
       }
     }
 
-    //视频窗口
+    //2
     Window {
         id:             video2Window
         width:          _pipSize
@@ -324,10 +347,6 @@ Item {
             video2Window.visible = false
         }
     }
-
-    /* This timer will startVideo again after the popup window appears and is loaded.
-     * Such approach was the only one to avoid a crash for windows users
-     */
     Timer {
       id: video2PopUpTimer
       interval: 2000;
@@ -341,7 +360,68 @@ Item {
           QGroundControl.videoManager.startVideo(1)
       }
     }
+    //3
+    Window {
+        id:             video3Window
+        width:          _pipSize
+        height:         _pipSize * (9/16)
+        visible:        false
 
+        Item {
+            id:             video3Item
+            anchors.fill:   parent
+        }
+
+        onClosing: {
+            _flightVideo3.state = "unpopup"
+            video3Window.visible = false
+        }
+    }
+    Timer {
+      id: video3PopUpTimer
+      interval: 2000;
+      running: false;
+      repeat: false
+      onTriggered: {
+          if (_flightVideo3.state ==  "popup") {
+            _flightVideo3.state = "popup-finished"
+          }
+          QGroundControl.videoManager.startVideo(2)
+      }
+    }
+    //4
+    Window {
+        id:             video4Window
+        width:          _pipSize
+        height:         _pipSize * (9/16)
+        visible:        false
+
+        Item {
+            id:             video4Item
+            anchors.fill:   parent
+        }
+
+        onClosing: {
+            _flightVideo4.state = "unpopup"
+            video4Window.visible = false
+        }
+    }
+    Timer {
+      id: video4PopUpTimer
+      interval: 2000;
+      running: false;
+      repeat: false
+      onTriggered: {
+          if (_flightVideo4.state ==  "popup") {
+            _flightVideo4.state = "popup-finished"
+          }
+          QGroundControl.videoManager.startVideo(3)
+      }
+    }
+
+
+
+//end
     QGCMapPalette { id: mapPal; lightColors: mainIsMap ? mainWindow.flightDisplayMap.isSatelliteMap : true }
 
     Item {
@@ -352,11 +432,12 @@ Item {
         Item {
             id: _flightMapContainer
             z:  mainIsMap ? _mapAndVideo.z + 1 : _mapAndVideo.z + 2
-            anchors.left:   _mapAndVideo.left
+            /*anchors.left:   _mapAndVideo.left
             anchors.bottom: _mapAndVideo.bottom
             visible:        mainIsMap || _isPipVisible && !QGroundControl.videoManager.fullScreen
-            width:          mainIsMap ? _mapAndVideo.width  : _pipSize
-            height:         mainIsMap ? _mapAndVideo.height : _pipSize * (9/16)
+            width:          mainIsMap ? _mapAndVideo.width *0.85  : _pipSize
+            height:         mainIsMap ? _mapAndVideo.height *0.8 : _pipSize * (9/16)*/
+            anchors.fill: v4position
             states: [
                 State {
                     name:   "pipMode"
@@ -388,15 +469,62 @@ Item {
                 }
             }
         }
+        Rectangle {
+            id:             mask
+            anchors.fill:   parent
+            color:          "black"
+            z:-1
+        }
 
+Item{
+id:mainposition
+anchors.left:   parent.left
+anchors.top: parent.top
+width:          _mapAndVideo.width *0.75
+height:         _mapAndVideo.height *0.75
+anchors.margins: 0
+}
+Item{
+id:v1position
+anchors.left:   parent.left
+anchors.bottom:  parent.bottom
+width:          _mapAndVideo.width *0.25
+height:         _mapAndVideo.height *0.25
+anchors.margins: 0
+}
+Item{
+id:v2position
+anchors.left:   v1position.right
+anchors.bottom:  parent.bottom
+width:          _mapAndVideo.width *0.25
+height:         _mapAndVideo.height *0.25
+anchors.margins: 0
+}
+Item{
+id:v3position
+anchors.left:   v2position.right
+anchors.bottom:  parent.bottom
+width:          _mapAndVideo.width *0.25
+height:         _mapAndVideo.height *0.25
+}
+Item{
+id:v4position
+anchors.left:   v3position.right
+anchors.bottom:  parent.bottom
+width:          _mapAndVideo.width *0.25
+height:         _mapAndVideo.height *0.25
+anchors.margins: 0
+}
         //-- Video View
         Item {
             id:             _flightVideo
             z:              mainIsMap ? _mapAndVideo.z + 2 : _mapAndVideo.z + 1
-            width:          !mainIsMap ? _mapAndVideo.width  : _pipSize
-            height:         !mainIsMap ? _mapAndVideo.height : _pipSize * (9/16)
+            anchors.fill:mainposition
+            anchors.margins: 0
+            /*width:          !mainIsMap ? _mapAndVideo.width *0.85 : _pipSize
+            height:         !mainIsMap ? _mapAndVideo.height *0.8 : _pipSize * (9/16)
             anchors.left:   _mapAndVideo.left
-            anchors.bottom: _mapAndVideo.bottom
+            anchors.bottom: _mapAndVideo.bottom*/
             visible:        QGroundControl.videoManager.hasVideo && (!mainIsMap || _isPipVisible)
 
             onParentChanged: {
@@ -406,9 +534,9 @@ Item {
                  */
                 if(parent == _mapAndVideo) {
                     // Do anchors again after popup
-                    anchors.left =       _mapAndVideo.left
-                    anchors.bottom =     _mapAndVideo.bottom
-                    anchors.margins =    _toolsMargin
+                    anchors.fill=mainposition
+                    anchors.margins= 0
+
                 }
             }
 
@@ -417,7 +545,7 @@ Item {
                     name:   "pipMode"
                     PropertyChanges {
                         target:             _flightVideo
-                        anchors.margins:    ScreenTools.defaultFontPixelHeight
+                        anchors.margins:    0//ScreenTools.defaultFontPixelHeight
                     }
                     PropertyChanges {
                         target:             _flightVideoPipControl
@@ -494,26 +622,20 @@ Item {
             }
         }
 
-        //-- Video View 2
+        // 2
         Item {
             id:             _flightVideo2
             z:              mainIsMap ? _mapAndVideo.z + 3 : _mapAndVideo.z + 2
-            width:          _pipSize
+            /*width:          _pipSize
             height:         _pipSize * (9/16)
             anchors.right:   _mapAndVideo.right
-            anchors.bottom: _mapAndVideo.bottom
+            anchors.bottom: _mapAndVideo.bottom*/
+            anchors.fill: v1position
+            anchors.margins: 0
             visible:        QGroundControl.videoManager.hasVideo2 && (!mainIsMap || _isPipVisible2)
 
             onParentChanged: {
-                /* If video comes back from popup
-                 * correct anchors.
-                 * Such thing is not possible with ParentChange.
-                 */
                 if(parent == _mapAndVideo) {
-                    // Do anchors again after popup
-                    anchors.right =       _mapAndVideo.right
-                    anchors.bottom =     _mapAndVideo.bottom
-                    anchors.margins =    _toolsMargin
                 }
             }
 
@@ -522,7 +644,7 @@ Item {
                     name:   "pipMode"
                     PropertyChanges {
                         target:             _flightVideo2
-                        anchors.margins:    ScreenTools.defaultFontPixelHeight
+                        anchors.margins:    0//ScreenTools.defaultFontPixelHeight
                     }
                     PropertyChanges {
                         target:             _flightVideo2PipControl
@@ -544,8 +666,6 @@ Item {
                     name: "popup"
                     StateChangeScript {
                         script: {
-                            // Stop video, restart it again with Timer
-                            // Avoiding crashes if ParentChange is not yet done
                             QGroundControl.videoManager.stopVideo(1)
                             video2PopUpTimer.running = true
                         }
@@ -584,13 +704,191 @@ Item {
                     }
                 }
             ]
-            //-- Video Streaming
             FlightDisplayViewVideo2 {
                 id:             video2Streaming
                 anchors.fill:   parent
                 visible:        QGroundControl.videoManager.isGStreamer2
             }
         }
+        // 3
+        Item {
+            id:             _flightVideo3
+            z:              mainIsMap ? _mapAndVideo.z + 5 : _mapAndVideo.z + 4
+            /*width:          _pipSize
+            height:         _pipSize * (9/16)
+            anchors.left:   _mapAndVideo.left
+            anchors.top: _mapAndVideo.top*/
+            anchors.fill: v2position
+            anchors.margins: 0
+            visible:        QGroundControl.videoManager.hasVideo3 && (!mainIsMap || _isPipVisible3)
+
+            onParentChanged: {
+                if(parent == _mapAndVideo) {
+
+                }
+            }
+
+            states: [
+                State {
+                    name:   "pipMode"
+                    PropertyChanges {
+                        target:             _flightVideo3
+                        anchors.margins:    0//ScreenTools.defaultFontPixelHeight
+                    }
+                    PropertyChanges {
+                        target:             _flightVideo3PipControl
+                        inPopup:            false
+                    }
+                },
+                State {
+                    name:   "fullMode"
+                    PropertyChanges {
+                        target:             _flightVideo3
+                        anchors.margins:    0
+                    }
+                    PropertyChanges {
+                        target:             _flightVideo3PipControl
+                        inPopup:            false
+                    }
+                },
+                State {
+                    name: "popup"
+                    StateChangeScript {
+                        script: {
+                            QGroundControl.videoManager.stopVideo(2)
+                            video2PopUpTimer.running = true
+                        }
+                    }
+                    PropertyChanges {
+                        target:             _flightVideo3PipControl
+                        inPopup:            true
+                    }
+                },
+                State {
+                    name: "popup-finished"
+                    ParentChange {
+                        target:             _flightVideo3
+                        parent:             video3Item
+                        x:                  0
+                        y:                  0
+                        width:              video3Item.width
+                        height:             video3Item.height
+                    }
+                },
+                State {
+                    name: "unpopup"
+                    StateChangeScript {
+                        script: {
+                            QGroundControl.videoManager.stopVideo(2)
+                            video2PopUpTimer.running = true
+                        }
+                    }
+                    ParentChange {
+                        target:             _flightVideo3
+                        parent:             _mapAndVideo
+                    }
+                    PropertyChanges {
+                        target:             _flightVideo3PipControl
+                        inPopup:             false
+                    }
+                }
+            ]
+            FlightDisplayViewVideo3 {
+                id:             video3Streaming
+                anchors.fill:   parent
+                visible:        QGroundControl.videoManager.isGStreamer3
+            }
+        }
+        // 4
+        Item {
+            id:             _flightVideo4
+            z:              mainIsMap ? _mapAndVideo.z + 7 : _mapAndVideo.z + 6
+            /*width:          _pipSize
+            height:         _pipSize * (9/16)
+            anchors.left:   _mapAndVideo.left
+            anchors.verticalCenter:   _mapAndVideo.verticalCenter*/
+            anchors.fill:v3position
+            anchors.margins: 0
+            visible:        QGroundControl.videoManager.hasVideo4 && (!mainIsMap || _isPipVisible2)
+
+            onParentChanged: {
+                if(parent == _mapAndVideo) {
+                    anchors.margins= 0
+                }
+            }
+
+            states: [
+                State {
+                    name:   "pipMode"
+                    PropertyChanges {
+                        target:             _flightVideo4
+                        anchors.margins:    0//ScreenTools.defaultFontPixelHeight
+                    }
+                    PropertyChanges {
+                        target:             _flightVideo4PipControl
+                        inPopup:            false
+                    }
+                },
+                State {
+                    name:   "fullMode"
+                    PropertyChanges {
+                        target:             _flightVideo4
+                        anchors.margins:    0
+                    }
+                    PropertyChanges {
+                        target:             _flightVideo4PipControl
+                        inPopup:            false
+                    }
+                },
+                State {
+                    name: "popup"
+                    StateChangeScript {
+                        script: {
+                            QGroundControl.videoManager.stopVideo(3)
+                            video2PopUpTimer.running = true
+                        }
+                    }
+                    PropertyChanges {
+                        target:             _flightVideo4PipControl
+                        inPopup:            true
+                    }
+                },
+                State {
+                    name: "popup-finished"
+                    ParentChange {
+                        target:             _flightVideo4
+                        parent:             video4Item
+                        x:                  0
+                        y:                  0
+                        width:              video4Item.width
+                        height:             video4Item.height
+                    }
+                },
+                State {
+                    name: "unpopup"
+                    StateChangeScript {
+                        script: {
+                            QGroundControl.videoManager.stopVideo(3)
+                            video2PopUpTimer.running = true
+                        }
+                    }
+                    ParentChange {
+                        target:             _flightVideo4
+                        parent:             _mapAndVideo
+                    }
+                    PropertyChanges {
+                        target:             _flightVideo4PipControl
+                        inPopup:             false
+                    }
+                }
+            ]
+            FlightDisplayViewVideo4 {
+                id:             video4Streaming
+                anchors.fill:   parent
+                visible:        QGroundControl.videoManager.isGStreamer4
+            }
+        }
+        //end
 
         QGCPipable {
             id:                 _flightVideoPipControl
@@ -600,7 +898,7 @@ Item {
             anchors.left:       _mapAndVideo.left
             anchors.bottom:     _mapAndVideo.bottom
             anchors.margins:    ScreenTools.defaultFontPixelHeight
-            visible:            QGroundControl.videoManager.hasVideo && !QGroundControl.videoManager.fullScreen && _flightVideo.state != "popup"
+            visible:            false//QGroundControl.videoManager.hasVideo && !QGroundControl.videoManager.fullScreen && _flightVideo.state != "popup"
             isHidden:           !_isPipVisible
             isDark:             isBackgroundDark
             enablePopup:        mainIsMap
@@ -620,7 +918,7 @@ Item {
                 _pipSize = newWidth
             }
         }
-
+//2
         QGCPipable {
             id:                 _flightVideo2PipControl
             z:                  _flightVideo.z + 5
@@ -629,7 +927,7 @@ Item {
             anchors.right:       _mapAndVideo.right
             anchors.bottom:     _mapAndVideo.bottom
             anchors.margins:    ScreenTools.defaultFontPixelHeight
-            visible:            QGroundControl.videoManager.hasVideo2 && !QGroundControl.videoManager.fullScreen && _flightVideo2.state != "popup"
+            visible:            false//QGroundControl.videoManager.hasVideo2 && !QGroundControl.videoManager.fullScreen && _flightVideo2.state != "popup"
             isHidden:           !_isPipVisible2
             isDark:             isBackgroundDark
             enablePopup:        mainIsMap
@@ -649,8 +947,64 @@ Item {
                 _pipSize = newWidth
             }
         }
-
-
+//3
+        QGCPipable {
+            id:                 _flightVideo3PipControl
+            z:                  _flightVideo.z + 6
+            width:              _pipSize
+            height:             _pipSize * (9/16)
+            anchors.left:       _mapAndVideo.left
+            anchors.top:     _mapAndVideo.top
+            anchors.margins:    ScreenTools.defaultFontPixelHeight
+            visible:            false//QGroundControl.videoManager.hasVideo3 && !QGroundControl.videoManager.fullScreen && _flightVideo3.state != "popup"
+            isHidden:           !_isPipVisible3
+            isDark:             isBackgroundDark
+            enablePopup:        mainIsMap
+            onActivated: {
+//                mainIsMap = !mainIsMap
+//                setStates()
+//                _fMap.adjustMapSize()
+            }
+            onHideIt: {
+                setPipVisibility3(!state)
+            }
+            onPopup: {
+                video3Window.visible = true
+                _flightVideo3.state = "popup"
+            }
+            onNewWidth: {
+                _pipSize = newWidth
+            }
+        }
+//4
+        QGCPipable {
+            id:                 _flightVideo4PipControl
+            z:                  _flightVideo.z + 7
+            width:              _pipSize
+            height:             _pipSize * (9/16)
+            anchors.left:       _mapAndVideo.left
+            anchors.verticalCenter:       _mapAndVideo.verticalCenter
+            anchors.margins:    ScreenTools.defaultFontPixelHeight
+            visible:            false//QGroundControl.videoManager.hasVideo4 && !QGroundControl.videoManager.fullScreen && _flightVideo4.state != "popup"
+            isHidden:           !_isPipVisible4
+            isDark:             isBackgroundDark
+            enablePopup:        mainIsMap
+            onActivated: {
+//                mainIsMap = !mainIsMap
+//                setStates()
+//                _fMap.adjustMapSize()
+            }
+            onHideIt: {
+                setPipVisibility4(!state)
+            }
+            onPopup: {
+                video4Window.visible = true
+                _flightVideo4.state = "popup"
+            }
+            onNewWidth: {
+                _pipSize = newWidth
+            }
+        }
         //单机及集群界面显示
         Row {
             id:                     singleMultiSelector
@@ -687,6 +1041,178 @@ Item {
             visible:            singleVehicleView.checked && !QGroundControl.videoManager.fullScreen
         }
 
+        MouseArea {
+            id:                     v1clk
+            width:                  2 * ScreenTools.defaultFontPixelHeight
+            height:                 2 * ScreenTools.defaultFontPixelHeight
+            z:                      _flightVideo.z + 7
+            anchors.left:           v1position.left
+            anchors.bottom:         v1position.bottom
+            onPressed:               {_ptemp=_mainisv
+                                        switch(_mainisv)
+                                        {
+                                        case 1: _flightVideo.anchors.fill=v1position
+                                            break
+                                        case 2: _flightVideo2.anchors.fill=v1position
+                                            break
+                                        case 3: _flightVideo3.anchors.fill=v1position
+                                            break
+                                        case 4: _flightVideo4.anchors.fill=v1position
+                                            break
+                                        case 5: _flightMapContainer.anchors.fill=v1position
+                                            break
+                                        }
+                                        _mainisv=_p2v
+                                        switch(_p2v)
+                                        {
+                                        case 1: _flightVideo.anchors.fill=mainposition
+                                            break
+                                        case 2: _flightVideo2.anchors.fill=mainposition
+                                            break
+                                        case 3: _flightVideo3.anchors.fill=mainposition
+                                            break
+                                        case 4: _flightVideo4.anchors.fill=mainposition
+                                            break
+                                        case 5: _flightMapContainer.anchors.fill=mainposition
+                                            break
+                                        }
+                                        _p2v=_ptemp
+                                    }
+            Image {
+                source:         "/qmlimages/MapSync.svg"
+                fillMode:       Image.PreserveAspectFit
+                anchors.fill:   parent
+            }
+        }
+        MouseArea{
+            id:                     v2clk
+            width:                  2 * ScreenTools.defaultFontPixelHeight
+            height:                 2 * ScreenTools.defaultFontPixelHeight
+            z:                      _flightVideo.z + 8
+            anchors.left:           v2position.left
+            anchors.bottom:         v2position.bottom
+            onPressed: {_ptemp=_mainisv
+            switch(_mainisv)
+            {
+            case 1: _flightVideo.anchors.fill=v2position
+                break
+            case 2: _flightVideo2.anchors.fill=v2position
+                break
+            case 3: _flightVideo3.anchors.fill=v2position
+                break
+            case 4: _flightVideo4.anchors.fill=v2position
+                break
+            case 5: _flightMapContainer.anchors.fill=v2position
+                break
+            }
+            _mainisv=_p3v
+            switch(_p3v)
+            {
+            case 1: _flightVideo.anchors.fill=mainposition
+                break
+            case 2: _flightVideo2.anchors.fill=mainposition
+                break
+            case 3: _flightVideo3.anchors.fill=mainposition
+                break
+            case 4: _flightVideo4.anchors.fill=mainposition
+                break
+            case 5: _flightMapContainer.anchors.fill=mainposition
+                break
+            }
+            _p3v=_ptemp
+        }
+            Image {
+                source:         "/qmlimages/MapSync.svg"
+                fillMode:       Image.PreserveAspectFit
+                anchors.fill:   parent
+            }
+        }
+        MouseArea{
+            id:                     v3clk
+            width:                  2 * ScreenTools.defaultFontPixelHeight
+            height:                 2 * ScreenTools.defaultFontPixelHeight
+            z:                      _flightVideo.z + 9
+            anchors.left:           v3position.left
+            anchors.bottom:         v3position.bottom
+            onPressed: {_ptemp=_mainisv
+            switch(_mainisv)
+            {
+            case 1: _flightVideo.anchors.fill=v3position
+                break
+            case 2: _flightVideo2.anchors.fill=v3position
+                break
+            case 3: _flightVideo3.anchors.fill=v3position
+                break
+            case 4: _flightVideo4.anchors.fill=v3position
+                break
+            case 5: _flightMapContainer.anchors.fill=v3position
+                break
+            }
+            _mainisv=_p4v
+            switch(_p4v)
+            {
+            case 1: _flightVideo.anchors.fill=mainposition
+                break
+            case 2: _flightVideo2.anchors.fill=mainposition
+                break
+            case 3: _flightVideo3.anchors.fill=mainposition
+                break
+            case 4: _flightVideo4.anchors.fill=mainposition
+                break
+            case 5: _flightMapContainer.anchors.fill=mainposition
+                break
+            }
+            _p4v=_ptemp
+        }
+            Image {
+                source:         "/qmlimages/MapSync.svg"
+                fillMode:       Image.PreserveAspectFit
+                anchors.fill:   parent
+            }
+        }
+        MouseArea{
+            id:                     v4clk
+            width:                  2 * ScreenTools.defaultFontPixelHeight
+            height:                 2 * ScreenTools.defaultFontPixelHeight
+            z:                      _flightVideo.z + 7
+            anchors.left:           v4position.left
+            anchors.bottom:         v4position.bottom
+            onPressed: {_ptemp=_mainisv
+            switch(_mainisv)
+            {
+            case 1: _flightVideo.anchors.fill=v4position
+                break
+            case 2: _flightVideo2.anchors.fill=v4position
+                break
+            case 3: _flightVideo3.anchors.fill=v4position
+                break
+            case 4: _flightVideo4.anchors.fill=v4position
+                break
+            case 5: _flightMapContainer.anchors.fill=v4position
+                break
+            }
+            _mainisv=_p5v
+            switch(_p5v)
+            {
+            case 1: _flightVideo.anchors.fill=mainposition
+                break
+            case 2: _flightVideo2.anchors.fill=mainposition
+                break
+            case 3: _flightVideo3.anchors.fill=mainposition
+                break
+            case 4: _flightVideo4.anchors.fill=mainposition
+                break
+            case 5: _flightMapContainer.anchors.fill=mainposition
+                break
+            }
+            _p5v=_ptemp
+        }
+            Image {
+                source:         "/qmlimages/MapSync.svg"
+                fillMode:       Image.PreserveAspectFit
+                anchors.fill:   parent
+            }
+        }
         //-------------------------------------------------------------------------
         //-- Loader helper for plugins to overlay elements over the fly view
         Loader {
@@ -730,7 +1256,7 @@ Item {
         }
 
         ToolStrip {
-            visible:            (activeVehicle ? activeVehicle.guidedModeSupported : true) && !QGroundControl.videoManager.fullScreen
+            visible:            false//(activeVehicle ? activeVehicle.guidedModeSupported : true) && !QGroundControl.videoManager.fullScreen
             id:                 toolStrip
 
             anchors.leftMargin: isInstrumentRight() ? _toolsMargin : undefined

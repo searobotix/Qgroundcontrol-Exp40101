@@ -4,6 +4,8 @@ FlightDisplayView           1.0 FlightDisplayView.qml
 FlightDisplayViewMap        1.0 FlightDisplayViewMap.qml
 FlightDisplayViewVideo      1.0 FlightDisplayViewVideo.qml
 FlightDisplayViewVideo2      1.0 FlightDisplayViewVideo2.qml
+FlightDisplayViewVideo3      1.0 FlightDisplayViewVideo3.qml
+FlightDisplayViewVideo4      1.0 FlightDisplayViewVideo4.qml
 FlightDisplayViewWidgets    1.0 FlightDisplayViewWidgets.qml
 GuidedActionConfirm         1.0 GuidedActionConfirm.qml
 GuidedActionList            1.0 GuidedActionList.qml

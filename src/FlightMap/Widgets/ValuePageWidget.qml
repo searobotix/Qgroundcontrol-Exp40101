@@ -29,6 +29,10 @@ Column {
 
     property var    _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle ? QGroundControl.multiVehicleManager.activeVehicle : QGroundControl.multiVehicleManager.offlineEditingVehicle
     property real   _margins:       ScreenTools.defaultFontPixelWidth / 2
+    property real   _defaultSize:       ScreenTools.defaultFontPixelHeight * (9)
+    property real   _sizeRatio:         ScreenTools.isTinyScreen ? (width / _defaultSize) * 0.5 : width / _defaultSize
+    property int neutralValue: 1100;
+
 
     QGCPalette { id:qgcPal; colorGroupEnabled: true }
 
@@ -81,6 +85,7 @@ Column {
 
             QGCLabel {
                 width:                  parent.width
+                font.pointSize:         ScreenTools.mediumFontPointSize * (largeValue ? 2.0 : 1.5)
                 horizontalAlignment:    Text.AlignHCenter
                 wrapMode:               Text.WordWrap
                 text:                   fact.shortDescription + (fact.units ? " (" + fact.units + ")" : "")
@@ -88,7 +93,7 @@ Column {
             QGCLabel {
                 width:                  parent.width
                 horizontalAlignment:    Text.AlignHCenter
-                font.pointSize:         ScreenTools.mediumFontPointSize * (largeValue ? 1.3 : 1.0)
+                font.pointSize:         ScreenTools.mediumFontPointSize * (largeValue ? 2.0 : 1.5)
                 font.family:            largeValue ? ScreenTools.demiboldFontFamily : ScreenTools.normalFontFamily
                 fontSizeMode:           Text.HorizontalFit
                 text:                   fact.enumOrValueString
@@ -107,11 +112,12 @@ Column {
                 width:                  parent.width
                 wrapMode:               Text.WordWrap
                 horizontalAlignment:    Text.AlignHCenter
-                font.pointSize:         ScreenTools.isTinyScreen ? ScreenTools.smallFontPointSize * 0.75 : ScreenTools.smallFontPointSize
+                font.pointSize:         ScreenTools.isTinyScreen ? ScreenTools.smallFontPointSize * 1.0 : ScreenTools.smallFontPointSize*1.5
                 text:                   fact.shortDescription
             }
             QGCLabel {
                 width:                  parent.width
+                font.pointSize:         ScreenTools.isTinyScreen ? ScreenTools.smallFontPointSize * 1.0 : ScreenTools.smallFontPointSize*1.5
                 horizontalAlignment:    Text.AlignHCenter
                 fontSizeMode:           Text.HorizontalFit
                 text:                   fact.enumOrValueString
@@ -119,7 +125,7 @@ Column {
             QGCLabel {
                 width:                  parent.width
                 horizontalAlignment:    Text.AlignHCenter
-                font.pointSize:         ScreenTools.isTinyScreen ? ScreenTools.smallFontPointSize * 0.75 : ScreenTools.smallFontPointSize
+                font.pointSize:         ScreenTools.isTinyScreen ? ScreenTools.smallFontPointSize * 1.0 : ScreenTools.smallFontPointSize*1.5
                 fontSizeMode:           Text.HorizontalFit
                 text:                   fact.units
             }

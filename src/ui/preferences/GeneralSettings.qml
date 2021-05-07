@@ -50,12 +50,21 @@ Rectangle {
 
     property string _videoSource:               QGroundControl.settingsManager.videoSettings.videoSource.value
     property string _videoSource2:               QGroundControl.settingsManager.videoSettings.videoSource2.value
+    property string _videoSource3:               QGroundControl.settingsManager.videoSettings.videoSource3.value
+    property string _videoSource4:               QGroundControl.settingsManager.videoSettings.videoSource4.value
+
     property bool   _isGst:                     QGroundControl.videoManager.isGStreamer
     property bool   _isGst2:                     QGroundControl.videoManager.isGStreamer2
+    property bool   _isGst3:                     QGroundControl.videoManager.isGStreamer3
+    property bool   _isGst4:                     QGroundControl.videoManager.isGStreamer4
+
     property bool   _isUDP264:                  _isGst && _videoSource === QGroundControl.settingsManager.videoSettings.udp264VideoSource
     property bool   _isUDP265:                  _isGst && _videoSource === QGroundControl.settingsManager.videoSettings.udp265VideoSource
     property bool   _isRTSP:                    _isGst && _videoSource === QGroundControl.settingsManager.videoSettings.rtspVideoSource
     property bool   _isRTSP2:                   _isGst2 && _videoSource2 === QGroundControl.settingsManager.videoSettings.rtspVideoSource2
+    property bool   _isRTSP3:                   _isGst3 && _videoSource3 === QGroundControl.settingsManager.videoSettings.rtspVideoSource3
+    property bool   _isRTSP4:                   _isGst4 && _videoSource4 === QGroundControl.settingsManager.videoSettings.rtspVideoSource4
+
     property bool   _isTCP:                     _isGst && _videoSource === QGroundControl.settingsManager.videoSettings.tcpVideoSource
     property bool   _isMPEGTS:                  _isGst && _videoSource === QGroundControl.settingsManager.videoSettings.mpegtsVideoSource
 
@@ -1036,6 +1045,48 @@ Rectangle {
                                 Layout.preferredWidth:  _comboFieldWidth
                                 fact:                   QGroundControl.settingsManager.videoSettings.rtspUrl2
                                 visible:                _isRTSP2 && QGroundControl.settingsManager.videoSettings.rtspUrl2.visible
+                            }
+                            QGCLabel {
+                                text:                   qsTr("视频来源3")
+                                visible:                QGroundControl.settingsManager.videoSettings.videoSource3.visible
+                            }
+                            FactComboBox {
+                                id:                     videoSource3
+                                Layout.preferredWidth:  _comboFieldWidth
+                                indexModel:             false
+                                fact:                   QGroundControl.settingsManager.videoSettings.videoSource3
+                                visible:                QGroundControl.settingsManager.videoSettings.videoSource3.visible
+                            }
+
+                            QGCLabel {
+                                text:                   qsTr("RTSP URL 3")
+                                visible:                _isRTSP3 && QGroundControl.settingsManager.videoSettings.rtspUrl3.visible
+                            }
+                            FactTextField {
+                                Layout.preferredWidth:  _comboFieldWidth
+                                fact:                   QGroundControl.settingsManager.videoSettings.rtspUrl3
+                                visible:                _isRTSP3 && QGroundControl.settingsManager.videoSettings.rtspUrl3.visible
+                            }
+                            QGCLabel {
+                                text:                   qsTr("视频来源4")
+                                visible:                QGroundControl.settingsManager.videoSettings.videoSource4.visible
+                            }
+                            FactComboBox {
+                                id:                     videoSource4
+                                Layout.preferredWidth:  _comboFieldWidth
+                                indexModel:             false
+                                fact:                   QGroundControl.settingsManager.videoSettings.videoSource4
+                                visible:                QGroundControl.settingsManager.videoSettings.videoSource4.visible
+                            }
+
+                            QGCLabel {
+                                text:                   qsTr("RTSP URL 4")
+                                visible:                _isRTSP4 && QGroundControl.settingsManager.videoSettings.rtspUrl4.visible
+                            }
+                            FactTextField {
+                                Layout.preferredWidth:  _comboFieldWidth
+                                fact:                   QGroundControl.settingsManager.videoSettings.rtspUrl4
+                                visible:                _isRTSP4 && QGroundControl.settingsManager.videoSettings.rtspUrl4.visible
                             }
                             QGCLabel {
                                 text:                   qsTr("Aspect Ratio")

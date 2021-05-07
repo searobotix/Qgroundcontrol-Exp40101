@@ -97,7 +97,7 @@ Rectangle {
                     fontPointSize:  ScreenTools.smallFontPointSize
                     autoExclusive:  true
 
-                    enabled:        modelData.buttonEnabled
+                    //enabled:        modelData.buttonEnabled
                     visible:        modelData.buttonVisible
                     imageSource:    modelData.showAlternateIcon ? modelData.alternateIconSource : modelData.iconSource
                     text:           modelData.name

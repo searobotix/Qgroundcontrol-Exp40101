@@ -40,6 +40,10 @@ public:
     Q_PROPERTY(bool             isGStreamer             READ    isGStreamer                                 NOTIFY isGStreamerChanged)
     Q_PROPERTY(bool             hasVideo2                READ    hasVideo2                                    NOTIFY hasVideoChanged2)
     Q_PROPERTY(bool             isGStreamer2             READ    isGStreamer2                                 NOTIFY isGStreamerChanged2)
+    Q_PROPERTY(bool             hasVideo3                READ    hasVideo3                                    NOTIFY hasVideoChanged3)
+    Q_PROPERTY(bool             isGStreamer3             READ    isGStreamer3                                 NOTIFY isGStreamerChanged3)
+    Q_PROPERTY(bool             hasVideo4                READ    hasVideo4                                    NOTIFY hasVideoChanged4)
+    Q_PROPERTY(bool             isGStreamer4             READ    isGStreamer4                                 NOTIFY isGStreamerChanged4)
     Q_PROPERTY(bool             isTaisync               READ    isTaisync       WRITE   setIsTaisync        NOTIFY isTaisyncChanged)
     Q_PROPERTY(QString          videoSourceID           READ    videoSourceID                               NOTIFY videoSourceIDChanged)
     Q_PROPERTY(bool             uvcEnabled              READ    uvcEnabled                                  CONSTANT)
@@ -56,13 +60,22 @@ public:
     Q_PROPERTY(bool             streaming               READ    streaming                                   NOTIFY streamingChanged)
     Q_PROPERTY(bool             decoding                READ    decoding                                    NOTIFY decodingChanged)
     Q_PROPERTY(bool             decoding2                READ    decoding2                                    NOTIFY decodingChanged)
+    Q_PROPERTY(bool             decoding3                READ    decoding3                                    NOTIFY decodingChanged)
+    Q_PROPERTY(bool             decoding4                READ    decoding4                                    NOTIFY decodingChanged)
+
     Q_PROPERTY(bool             recording               READ    recording                                   NOTIFY recordingChanged)
     Q_PROPERTY(QSize            videoSize               READ    videoSize                                   NOTIFY videoSizeChanged)
 
     virtual bool        hasVideo            ();
     virtual bool        hasVideo2            ();
+    virtual bool        hasVideo3            ();
+    virtual bool        hasVideo4            ();
+
     virtual bool        isGStreamer         ();
     virtual bool        isGStreamer2         ();
+    virtual bool        isGStreamer3         ();
+    virtual bool        isGStreamer4         ();
+
     virtual bool        isTaisync           () { return _isTaisync; }
     virtual bool        fullScreen          () { return _fullScreen; }
     virtual QString     videoSourceID       () { return _videoSourceID; }
@@ -85,6 +98,12 @@ public:
     bool decoding2(void) {
         return _decoding2;
     }
+    bool decoding3(void) {
+        return _decoding3;
+    }
+    bool decoding4(void) {
+        return _decoding4;
+    }
 
     bool recording(void) {
         return _recording;
@@ -99,7 +118,9 @@ public:
 // new arcitecture does not assume direct access to video receiver from QML side, even if it works for now
     virtual VideoReceiver*  videoReceiver           () { return _videoReceiver[0]; }
     virtual VideoReceiver*  video2Receiver           () { return _videoReceiver[1]; }
-    virtual VideoReceiver*  thermalVideoReceiver    () { return _videoReceiver[2]; }
+    virtual VideoReceiver*  video3Receiver           () { return _videoReceiver[2]; }
+    virtual VideoReceiver*  video4Receiver           () { return _videoReceiver[3]; }
+    virtual VideoReceiver*  thermalVideoReceiver    () { return _videoReceiver[4]; }
 
 #if defined(QGC_DISABLE_UVC)
     virtual bool        uvcEnabled          () { return false; }
@@ -126,10 +147,18 @@ signals:
     void isGStreamerChanged         ();
     void hasVideoChanged2            ();
     void isGStreamerChanged2         ();
+    void hasVideoChanged3            ();
+    void isGStreamerChanged3         ();
+    void hasVideoChanged4            ();
+    void isGStreamerChanged4         ();
+
     void videoSourceIDChanged       ();
     void fullScreenChanged          ();
     void isAutoStreamChanged        ();
     void isAutoStreamChanged2        ();
+    void isAutoStreamChanged3        ();
+    void isAutoStreamChanged4        ();
+
     void isTaisyncChanged           ();
     void aspectRatioChanged         ();
     void autoStreamConfiguredChanged();
@@ -143,9 +172,15 @@ signals:
 protected slots:
     void _videoSourceChanged        ();
     void _videoSourceChanged2        ();
+    void _videoSourceChanged3        ();
+    void _videoSourceChanged4        ();
+
     void _udpPortChanged            ();
     void _rtspUrlChanged            ();
     void _rtspUrlChanged2            ();
+    void _rtspUrlChanged3            ();
+    void _rtspUrlChanged4            ();
+
     void _tcpUrlChanged             ();
     void _lowLatencyModeChanged     ();
     void _updateUVC                 ();
@@ -170,19 +205,22 @@ protected:
     QString                 _imageFile;
     SubtitleWriter          _subtitleWriter;
     bool                    _isTaisync              = false;
-    VideoReceiver*          _videoReceiver[3]       = { nullptr, nullptr, nullptr };
-    void*                   _videoSink[3]           = { nullptr, nullptr, nullptr };
-    QString                 _videoUri[3];
+    VideoReceiver*          _videoReceiver[5]       = { nullptr, nullptr, nullptr, nullptr, nullptr };
+    void*                   _videoSink[5]           = { nullptr, nullptr, nullptr, nullptr, nullptr };
+    QString                 _videoUri[5];
     // FIXME: AV: _videoStarted seems to be access from 3 different threads, from time to time
     // 1) Video Receiver thread
     // 2) Video Manager/main app thread
     // 3) Qt rendering thread (during video sink creation process which should happen in this thread)
     // It works for now but...
-    bool                    _videoStarted[3]        = { false, false, false };
-    bool                    _lowLatencyStreaming[3] = { false, false, false };
+    bool                    _videoStarted[5]        = { false, false, false, false, false };
+    bool                    _lowLatencyStreaming[5] = { false, false, false, false, false };
     QAtomicInteger<bool>    _streaming              = false;
     QAtomicInteger<bool>    _decoding               = false;
     QAtomicInteger<bool>    _decoding2               = false;
+    QAtomicInteger<bool>    _decoding3               = false;
+    QAtomicInteger<bool>    _decoding4               = false;
+
     QAtomicInteger<bool>    _recording              = false;
     QAtomicInteger<quint32> _videoSize              = 0;
     VideoSettings*          _videoSettings          = nullptr;

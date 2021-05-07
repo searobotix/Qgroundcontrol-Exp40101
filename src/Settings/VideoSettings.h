@@ -37,11 +37,18 @@ public:
     DEFINE_SETTINGFACT(lowLatencyMode)
 
     DEFINE_SETTINGFACT(videoSource2)
+    DEFINE_SETTINGFACT(videoSource3)
+    DEFINE_SETTINGFACT(videoSource4)
+
     DEFINE_SETTINGFACT(rtspUrl2)
+    DEFINE_SETTINGFACT(rtspUrl3)
+    DEFINE_SETTINGFACT(rtspUrl4)
 
     Q_PROPERTY(bool     streamConfigured        READ streamConfigured       NOTIFY streamConfiguredChanged)
     Q_PROPERTY(QString  rtspVideoSource         READ rtspVideoSource        CONSTANT)
     Q_PROPERTY(QString  rtspVideoSource2         READ rtspVideoSource2        CONSTANT)
+    Q_PROPERTY(QString  rtspVideoSource3         READ rtspVideoSource3        CONSTANT)
+    Q_PROPERTY(QString  rtspVideoSource4         READ rtspVideoSource4        CONSTANT)
     Q_PROPERTY(QString  udp264VideoSource       READ udp264VideoSource      CONSTANT)
     Q_PROPERTY(QString  udp265VideoSource       READ udp265VideoSource      CONSTANT)
     Q_PROPERTY(QString  tcpVideoSource          READ tcpVideoSource         CONSTANT)
@@ -51,6 +58,8 @@ public:
     bool     streamConfigured       ();
     QString  rtspVideoSource        () { return videoSourceRTSP; }
     QString  rtspVideoSource2        () { return videoSourceRTSP2; }
+    QString  rtspVideoSource3        () { return videoSourceRTSP3; }
+    QString  rtspVideoSource4        () { return videoSourceRTSP4; }
     QString  udp264VideoSource      () { return videoSourceUDPH264; }
     QString  udp265VideoSource      () { return videoSourceUDPH265; }
     QString  tcpVideoSource         () { return videoSourceTCP; }
@@ -63,6 +72,8 @@ public:
     static const char* videoSourceUDPH265;
     static const char* videoSourceRTSP;
     static const char* videoSourceRTSP2;
+    static const char* videoSourceRTSP3;
+    static const char* videoSourceRTSP4;
     static const char* videoSourceTCP;
     static const char* videoSourceMPEGTS;
 
@@ -78,6 +89,9 @@ private:
 private:
     bool _noVideo = false;
     bool _noVideo2 = false;
+    bool _noVideo3 = false;
+    bool _noVideo4 = false;
+
 
 };
 

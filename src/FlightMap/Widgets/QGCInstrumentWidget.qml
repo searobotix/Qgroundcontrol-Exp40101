@@ -19,9 +19,9 @@ import QGroundControl.Palette       1.0
 
 Rectangle {
     id:             root
-    width:          getPreferredInstrumentWidth()
-    height:         _outerRadius * 2
-    radius:         _outerRadius
+    width:          _mapAndVideo.width *0.18
+    height:         _mapAndVideo.width *0.18
+    //radius:         _outerRadius
     color:          qgcPal.window
     border.width:   1
     border.color:   _isSatellite ? qgcPal.mapWidgetBorderLight : qgcPal.mapWidgetBorderDark
@@ -34,7 +34,7 @@ Rectangle {
     property real   _normalFontSize:    ScreenTools.defaultFontPointSize * 1.5  * _sizeRatio
     property real   _labelFontSize:     ScreenTools.defaultFontPointSize * 0.75 * _sizeRatio
     property real   _spacing:           ScreenTools.defaultFontPixelHeight * 0.33
-    property real   _topBottomMargin:   (width * 0.05) / 2
+    property real   _topBottomMargin:   0//(width * 0.05) / 2
     property real   _availableValueHeight: maxHeight - (root.height + _valuesItem.anchors.topMargin)
 
     // Prevent all clicks from going through to lower layers
@@ -46,20 +46,18 @@ Rectangle {
 
     QGCAttitudeWidget {
         id:                 attitude
-        anchors.leftMargin: _topBottomMargin
-        anchors.left:       parent.left
-        size:               _innerRadius * 2
-        vehicle:            activeVehicle
+        anchors.horizontalCenter:  parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+        size:               _innerRadius * 2.2
+        vehicle:            activeVehicle
     }
 
     QGCCompassWidget {
         id:                 compass
-        anchors.leftMargin: _spacing
-        anchors.left:       attitude.right
-        size:               _innerRadius * 2
-        vehicle:            activeVehicle
+        anchors.horizontalCenter:  parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+        size:               _innerRadius * 3
+        vehicle:            activeVehicle
     }
 
     Item {

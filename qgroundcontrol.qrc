@@ -242,6 +242,9 @@
         <file alias="VideoPageWidget.qml">src/FlightMap/Widgets/VideoPageWidget.qml</file>
         <file alias="VirtualJoystick.qml">src/FlightDisplay/VirtualJoystick.qml</file>
         <file alias="QGroundControl/FlightDisplay/FlightDisplayViewVideo2.qml">src/FlightDisplay/FlightDisplayViewVideo2.qml</file>
+        <file alias="QGroundControl/FlightDisplay/FlightDisplayViewVideo3.qml">src/FlightDisplay/FlightDisplayViewVideo3.qml</file>
+        <file alias="QGroundControl/FlightDisplay/FlightDisplayViewVideo4.qml">src/FlightDisplay/FlightDisplayViewVideo4.qml</file>
+
     </qresource>
     <qresource prefix="/json">
         <file alias="ADSBVehicleManager.SettingsGroup.json">src/Settings/ADSBVehicleManager.SettingsGroup.json</file>

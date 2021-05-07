@@ -68,14 +68,14 @@ Item {
 
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
-    Rectangle {
+    /*Rectangle {
         id:             borderRect
         anchors.fill:   parent
         radius:         width / 2
         color:          qgcPal.window
         border.color:   qgcPal.text
         border.width:   1
-    }
+    }*/
 
     Item {
         id:             instrument
@@ -131,7 +131,7 @@ Item {
             }
         }
 
-        Image {
+        /*Image {
             id:                 pointer
             width:              size * 0.65
             source:             vehicle ? vehicle.vehicleImageCompass : ""
@@ -144,7 +144,7 @@ Item {
                 origin.y:       pointer.height / 2
                 angle:          isNoseUpLocked()?0:_heading
             }
-        }
+        }*/
 
 
         QGCColoredImage {
@@ -158,12 +158,12 @@ Item {
             transform: Rotation {
                 origin.x:       compassDial.width  / 2
                 origin.y:       compassDial.height / 2
-                angle:          isNoseUpLocked()?-_heading:0
+                angle:          isNoseUpLocked()?0:0
             }
         }
 
 
-        Rectangle {
+        /*Rectangle {
             anchors.centerIn:   parent
             width:              size * 0.35
             height:             size * 0.2
@@ -182,7 +182,7 @@ Item {
                 property string _headingString2: _headingString.length === 1 ? "0" + _headingString : _headingString
                 property string _headingString3: _headingString2.length === 2 ? "0" + _headingString2 : _headingString2
             }
-        }
+        }*/
     }
 
     Rectangle {
