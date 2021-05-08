@@ -47,6 +47,9 @@ Rectangle {
     property real _panelWidth:                  _root.width * _internalWidthRatio
     property real _margins:                     ScreenTools.defaultFontPixelWidth
     property var _planViewSettings:             QGroundControl.settingsManager.planViewSettings
+    property var    _flyViewSettings:           QGroundControl.settingsManager.flyViewSettings
+    property var    _videoSettings:             QGroundControl.settingsManager.videoSettings
+
 
     property string _videoSource:               QGroundControl.settingsManager.videoSettings.videoSource.value
     property string _videoSource2:               QGroundControl.settingsManager.videoSettings.videoSource2.value
@@ -1088,6 +1091,18 @@ Rectangle {
                                 fact:                   QGroundControl.settingsManager.videoSettings.rtspUrl4
                                 visible:                _isRTSP4 && QGroundControl.settingsManager.videoSettings.rtspUrl4.visible
                             }
+                            QGCLabel {
+                                                               id:         videoDecodeLabel
+                                                               text:       qsTr("视频解码器")
+                                                               visible:    forceVideoDecoderComboBox.visible
+                                                           }
+                                                           FactComboBox {
+                                                               id:                     forceVideoDecoderComboBox
+                                                               Layout.preferredWidth:  _comboFieldWidth
+                                                               fact:                   _videoSettings.forceVideoDecoder
+                                                               visible:                true//fact.visible
+                                                               indexModel:             false
+                                                           }
                             QGCLabel {
                                 text:                   qsTr("Aspect Ratio")
                                 visible:                (_isGst || _isGst2) && QGroundControl.settingsManager.videoSettings.aspectRatio.visible

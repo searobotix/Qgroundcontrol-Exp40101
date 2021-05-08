@@ -44,6 +44,21 @@ public:
     DEFINE_SETTINGFACT(rtspUrl3)
     DEFINE_SETTINGFACT(rtspUrl4)
 
+
+    DEFINE_SETTINGFACT(forceVideoDecoder)
+
+    enum VideoDecoderOptions {
+        ForceVideoDecoderDefault = 0,
+        ForceVideoDecoderSoftware,
+        ForceVideoDecoderNVIDIA,
+        ForceVideoDecoderVAAPI,
+        ForceVideoDecoderDirectX3D,
+        ForceVideoDecoderVideoToolbox,
+    };
+    Q_ENUM(VideoDecoderOptions)
+    static const char* videoSource3DRSolo;
+    static const char* videoSourceParrotDiscovery;
+
     Q_PROPERTY(bool     streamConfigured        READ streamConfigured       NOTIFY streamConfiguredChanged)
     Q_PROPERTY(QString  rtspVideoSource         READ rtspVideoSource        CONSTANT)
     Q_PROPERTY(QString  rtspVideoSource2         READ rtspVideoSource2        CONSTANT)

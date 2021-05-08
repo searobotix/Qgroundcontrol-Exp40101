@@ -31,6 +31,8 @@ const char* VideoSettings::videoSourceUDPH264   = "UDP h.264 Video Stream";
 const char* VideoSettings::videoSourceUDPH265   = "UDP h.265 Video Stream";
 const char* VideoSettings::videoSourceTCP       = "TCP-MPEG2 Video Stream";
 const char* VideoSettings::videoSourceMPEGTS    = "MPEG-TS (h.264) Video Stream";
+const char* VideoSettings::videoSource3DRSolo           = "3DR Solo (requires restart)";
+const char* VideoSettings::videoSourceParrotDiscovery   = "Parrot Discovery";
 
 DECLARE_SETTINGGROUP(Video, "Video")
 {
@@ -46,6 +48,8 @@ DECLARE_SETTINGGROUP(Video, "Video")
 #endif
     videoSourceList.append(videoSourceTCP);
     videoSourceList.append(videoSourceMPEGTS);
+    videoSourceList.append(videoSource3DRSolo);
+    videoSourceList.append(videoSourceParrotDiscovery);
 #endif
 #ifndef QGC_DISABLE_UVC
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
@@ -121,6 +125,8 @@ QStringList videoSource4List;
     _setDefaults();
 }
 //end
+
+
 void VideoSettings::_setDefaults()
 {
     if (_noVideo) {
@@ -222,7 +228,27 @@ DECLARE_SETTINGSFACT_NO_FUNC(VideoSettings, videoSource4)
     return _videoSource4Fact;
 }
 
+DECLARE_SETTINGSFACT_NO_FUNC(VideoSettings, forceVideoDecoder)
+{
+    if (!_forceVideoDecoderFact) {
+        _forceVideoDecoderFact = _createSettingsFact(forceVideoDecoderName);
 
+        _forceVideoDecoderFact->setVisible(
+#ifdef Q_OS_IOS
+            false
+#else
+#ifdef Q_OS_ANDROID
+            false
+#else
+            true
+#endif
+#endif
+        );
+
+        connect(_forceVideoDecoderFact, &Fact::valueChanged, this, &VideoSettings::_configChanged);
+    }
+    return _forceVideoDecoderFact;
+}
 
 DECLARE_SETTINGSFACT_NO_FUNC(VideoSettings, udpPort)
 {
