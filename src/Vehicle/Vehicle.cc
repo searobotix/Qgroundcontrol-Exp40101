@@ -45,6 +45,10 @@
 #include "VehicleObjectAvoidance.h"
 #include "TrajectoryPoints.h"
 #include "QGCGeo.h"
+#include <QUdpSocket>
+#include <QDebug>
+#include <QUdpSocket>
+
 
 #if defined(QGC_AIRMAP_ENABLED)
 #include "AirspaceVehicleManager.h"
@@ -81,6 +85,8 @@ const char* Vehicle::_headingToHomeFactName =       "headingToHome";
 const char* Vehicle::_distanceToGCSFactName =       "distanceToGCS";
 const char* Vehicle::_hobbsFactName =               "hobbs";
 const char* Vehicle::_throttlePctFactName =         "throttlePct";
+
+const char* Vehicle::_partcurrFactName =             "partcurr";
 
 const char* Vehicle::_gpsFactGroupName =                "gps";
 const char* Vehicle::_battery1FactGroupName =           "battery";
@@ -196,6 +202,7 @@ Vehicle::Vehicle(LinkInterface*             link,
     , _rollRateFact         (0, _rollRateFactName,          FactMetaData::valueTypeDouble)
     , _pitchRateFact        (0, _pitchRateFactName,         FactMetaData::valueTypeDouble)
     , _yawRateFact          (0, _yawRateFactName,           FactMetaData::valueTypeDouble)
+    , _partcurrFact          (0, _partcurrFactName,           FactMetaData::valueTypeDouble)
     , _groundSpeedFact      (0, _groundSpeedFactName,       FactMetaData::valueTypeDouble)
     , _airSpeedFact         (0, _airSpeedFactName,          FactMetaData::valueTypeDouble)
     , _climbRateFact        (0, _climbRateFactName,         FactMetaData::valueTypeDouble)
@@ -396,6 +403,7 @@ Vehicle::Vehicle(MAV_AUTOPILOT              firmwareType,
     , _rollRateFact         (0, _rollRateFactName,          FactMetaData::valueTypeDouble)
     , _pitchRateFact        (0, _pitchRateFactName,         FactMetaData::valueTypeDouble)
     , _yawRateFact          (0, _yawRateFactName,           FactMetaData::valueTypeDouble)
+    , _partcurrFact          (0, _partcurrFactName,           FactMetaData::valueTypeDouble)
     , _groundSpeedFact      (0, _groundSpeedFactName,       FactMetaData::valueTypeDouble)
     , _airSpeedFact         (0, _airSpeedFactName,          FactMetaData::valueTypeDouble)
     , _climbRateFact        (0, _climbRateFactName,         FactMetaData::valueTypeDouble)
@@ -409,6 +417,7 @@ Vehicle::Vehicle(MAV_AUTOPILOT              firmwareType,
     , _distanceToGCSFact    (0, _distanceToGCSFactName,     FactMetaData::valueTypeDouble)
     , _hobbsFact            (0, _hobbsFactName,             FactMetaData::valueTypeString)
     , _throttlePctFact      (0, _throttlePctFactName,       FactMetaData::valueTypeUint16)
+
     , _gpsFactGroup(this)
     , _battery1FactGroup(this)
     , _battery2FactGroup(this)
@@ -476,6 +485,8 @@ void Vehicle::_commonInit()
     _addFact(&_rollRateFact,            _rollRateFactName);
     _addFact(&_pitchRateFact,           _pitchRateFactName);
     _addFact(&_yawRateFact,             _yawRateFactName);
+    _addFact(&_partcurrFact,             _partcurrFactName);
+
     _addFact(&_groundSpeedFact,         _groundSpeedFactName);
     _addFact(&_airSpeedFact,            _airSpeedFactName);
     _addFact(&_climbRateFact,           _climbRateFactName);
@@ -3791,6 +3802,158 @@ void Vehicle::setFirmwarePluginInstanceData(QObject* firmwarePluginInstanceData)
     firmwarePluginInstanceData->setParent(this);
     _firmwarePluginInstanceData = firmwarePluginInstanceData;
 }
+void Vehicle::startUDP()
+{
+    uSocket=new QUdpSocket;
+    uSocket ->bind(QHostAddress("0.0.0.0"),14555);
+    connect(this->uSocket,SIGNAL(readyRead()),this,SLOT(exaudp()));
+
+    return;
+}
+void Vehicle::exaudp()
+{
+    QByteArray indata;
+        qDebug()<<"accept";
+        double x=0;
+        indata.resize(uSocket->pendingDatagramSize());
+        uSocket->readDatagram(indata.data(),indata.size());
+        qDebug()<<indata.toHex()<<indata.size();
+        if(indata.size()!=11)
+        {
+            return;
+        }
+
+        unsigned char crc= 0x00;
+        for(int i=0;i<8;i++)
+        {
+        crc=CRC8Table[crc ^ indata[i]];
+        }
+        if((char)indata[8]!=crc||(char)indata[9]!=0x0d||(char)indata[10]!=0x0a)
+        {return;}
+        qDebug()<<crc;
+            int a[6];
+            for(int i=0;i<6;i++)
+                {
+                    a[i]=(int)indata[i]-48;
+                    qDebug()<<a[i];
+                }
+            x=a[0]*100+a[1]*10+a[2]+a[3]*0.1+a[4]*0.01+a[5]*0.001;
+            if(x>=999)
+            {
+                partcurrwaring();
+            }
+            else if(x<999)
+            {
+                _partcurrFact.setRawValue(x);
+            }
+            if((int)indata[6]!=_lightstatus)
+            {
+                _lightstatus=(int)indata[6];
+                emit lightstatusChanged();
+            }
+            if((int)indata[7]!=_motorstatus)
+            {
+                _motorstatus=(int)indata[7];
+                emit motorstatusChanged();
+            }
+
+}
+void Vehicle::partcurrwaring()
+{
+    _currwaring=1;
+    qgcApp()->showMessage(tr("Motor current Warning!Opreation Locked.Please check stats."));
+    emit partcurrwarn();
+
+}
+void Vehicle::currrecover()
+{
+    qDebug()<<"recover";
+    _currwaring=0;
+    emit partcurrwarn();
+}
+bool Vehicle::currwaring()
+{
+    return _currwaring;
+}
+void Vehicle::openlight()
+{
+    QByteArray send;
+    send.resize(5);
+    send[0]=0x4c;
+    send[1]=0x31;
+    send[2]=0x30;
+    send[3]=0x0d;
+    send[4]=0x0a;
+    uSocket->writeDatagram(send,QHostAddress("192.168.2.10"),14556);
+    qDebug()<<"open";
+    _lightstatus=1;
+    emit lightstatusChanged();
+    return;
+}
+void Vehicle::closelight()
+{
+    QByteArray send;
+    send.resize(2);
+    send[0]=0x4c;
+    send[1]=0x30;
+    send[2]=0x37;
+    send[3]=0x0d;
+    send[4]=0x0a;
+    uSocket->writeDatagram(send,QHostAddress("192.168.2.10"),14556);
+    qDebug()<<"close";
+    _lightstatus=0;
+    emit lightstatusChanged();
+    return;
+}
+void Vehicle::mcw()
+{
+
+    QByteArray send;
+    send.resize(2);
+    send[0]=0x54;
+    send[1]=0x31;
+    send[2]=0xcf;
+    send[3]=0x0d;
+    send[4]=0x0a;
+    uSocket->writeDatagram(send,QHostAddress("192.168.2.10"),14556);
+    qDebug()<<"mcw";
+    _motorstatus=1;
+    emit motorstatusChanged();
+    return;
+}
+void Vehicle::mccw()
+{
+
+    QByteArray send;
+    send.resize(2);
+    send[0]=0x54;
+    send[1]=0x32;
+    send[2]=0xc6;
+    send[3]=0x0d;
+    send[4]=0x0a;
+    uSocket->writeDatagram(send,QHostAddress("192.168.2.10"),14556);
+    _motorstatus=2;
+    qDebug()<<"mccw";
+    emit motorstatusChanged();
+    return;
+}
+void Vehicle::mstop()
+{
+
+    QByteArray send;
+    send.resize(2);
+    send[0]=0x54;
+    send[1]=0x30;
+    send[2]=0xc8;
+    send[3]=0x0d;
+    send[4]=0x0a;
+    uSocket->writeDatagram(send,QHostAddress("192.168.2.10"),14556);
+    _motorstatus=0;
+    qDebug()<<"mstop";
+    emit motorstatusChanged();
+    return;
+}
+
 
 QString Vehicle::missionFlightMode() const
 {

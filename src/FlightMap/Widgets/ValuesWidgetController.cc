@@ -35,6 +35,7 @@ ValuesWidgetController::ValuesWidgetController(void)
                             << "APMSubInfo.lights 1"
                             << "APMSubInfo.camera tilt"
                             << "APMSubInfo.input hold"
+                            << "Vehicle.partcurr"
                             ;
 
      smallDefaults       <<"Vehicle.roll"

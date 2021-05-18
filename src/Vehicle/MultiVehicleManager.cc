@@ -144,6 +144,7 @@ void MultiVehicleManager::_vehicleHeartbeatInfo(LinkInterface* link, int vehicle
         qgcApp()->showMessage(tr("Connected to Vehicle %1").arg(vehicleId));
     } else {
         setActiveVehicle(vehicle);
+        vehicle->startUDP();
     }
 
 #if defined (__ios__) || defined(__android__)

@@ -42,6 +42,13 @@
     "units":            "deg/s"
 },
 {
+    "name":             "partcurr",
+    "shortDescription": "电机电流",
+    "type":             "double",
+    "decimalPlaces":    3,
+    "units":            "A"
+},
+{
     "name":             "groundSpeed",
     "shortDescription": "Ground Speed",
     "type":             "double",

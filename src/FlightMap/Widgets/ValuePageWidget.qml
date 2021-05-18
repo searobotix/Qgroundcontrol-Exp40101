@@ -85,7 +85,7 @@ Column {
 
             QGCLabel {
                 width:                  parent.width
-                font.pointSize:         ScreenTools.mediumFontPointSize * (largeValue ? 2.0 : 1.5)
+                font.pointSize:         ScreenTools.mediumFontPointSize * 1.5
                 horizontalAlignment:    Text.AlignHCenter
                 wrapMode:               Text.WordWrap
                 text:                   fact.shortDescription + (fact.units ? " (" + fact.units + ")" : "")
@@ -93,7 +93,7 @@ Column {
             QGCLabel {
                 width:                  parent.width
                 horizontalAlignment:    Text.AlignHCenter
-                font.pointSize:         ScreenTools.mediumFontPointSize * (largeValue ? 2.0 : 1.5)
+                font.pointSize:         ScreenTools.mediumFontPointSize * 1.5
                 font.family:            largeValue ? ScreenTools.demiboldFontFamily : ScreenTools.normalFontFamily
                 fontSizeMode:           Text.HorizontalFit
                 text:                   fact.enumOrValueString
@@ -112,12 +112,12 @@ Column {
                 width:                  parent.width
                 wrapMode:               Text.WordWrap
                 horizontalAlignment:    Text.AlignHCenter
-                font.pointSize:         ScreenTools.isTinyScreen ? ScreenTools.smallFontPointSize * 1.0 : ScreenTools.smallFontPointSize*1.5
+                font.pointSize:         ScreenTools.smallFontPointSize*1.5
                 text:                   fact.shortDescription
             }
             QGCLabel {
                 width:                  parent.width
-                font.pointSize:         ScreenTools.isTinyScreen ? ScreenTools.smallFontPointSize * 1.0 : ScreenTools.smallFontPointSize*1.5
+                font.pointSize:         ScreenTools.smallFontPointSize*1.5
                 horizontalAlignment:    Text.AlignHCenter
                 fontSizeMode:           Text.HorizontalFit
                 text:                   fact.enumOrValueString
@@ -125,7 +125,7 @@ Column {
             QGCLabel {
                 width:                  parent.width
                 horizontalAlignment:    Text.AlignHCenter
-                font.pointSize:         ScreenTools.isTinyScreen ? ScreenTools.smallFontPointSize * 1.0 : ScreenTools.smallFontPointSize*1.5
+                font.pointSize:         ScreenTools.smallFontPointSize*1.5
                 fontSizeMode:           Text.HorizontalFit
                 text:                   fact.units
             }
@@ -297,5 +297,57 @@ Column {
                 }
             }
         }
+
+
+
+
+
+    }
+    Row{
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.margins: _margins*2
+    QGCButton{
+    text:qsTr("开灯")
+    onClicked:_activeVehicle.openlight()
+    anchors.margins: _margins
+    enabled:activeVehicle&&!_activeVehicle.lightstatus
+    }
+    QGCButton{
+    text:qsTr("关灯")
+    onClicked:_activeVehicle.closelight()
+    anchors.margins: _margins
+    enabled:activeVehicle&&_activeVehicle.lightstatus
+    }
+    }
+    Row{
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.margins: _margins *2
+    QGCButton{
+    text:qsTr("正转")
+    onClicked:_activeVehicle.mcw()
+    anchors.margins: _margins
+    visible:!_activeVehicle.partcurrwarning
+    enabled:activeVehicle&&(_activeVehicle.motorstatus===1?false:true)
+    }
+    QGCButton{
+    text:qsTr("停止")
+    onClicked:_activeVehicle.mstop()
+    anchors.margins: _margins
+    visible:!_activeVehicle.partcurrwarning
+    enabled:activeVehicle
+    }
+    QGCButton{
+    text:qsTr("反转")
+    onClicked:_activeVehicle.mccw()
+    anchors.margins: _margins
+    visible:!_activeVehicle.partcurrwarning
+    enabled:activeVehicle&&(_activeVehicle.motorstatus===2?false:true)
+    }
+    QGCButton{
+    text:qsTr("复位")
+    onClicked:_activeVehicle.currrecover()
+    anchors.margins: _margins
+    visible:_activeVehicle.partcurrwarning
+    }
     }
 }
